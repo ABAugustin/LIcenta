@@ -27,7 +27,7 @@ def generate_e(p,q):
     return e
 
 def rsa_encrypt(N ,e , plaintext):
-    encrypted_text=""
+    encrypted_text = ""
     for char in plaintext:
         encrypted_text += chr(putere(ord(char),e)%N)
     return encrypted_text
