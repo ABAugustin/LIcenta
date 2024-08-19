@@ -1,7 +1,25 @@
+from Packages.CertOperations import extract_wg_cert_extension_data
+from Packages.MongoMethods import insert_data_into_db
 from Packages.SandRCerts import *
 
 
-def start_server(cert_dir,cert_dir_wg, host='0.0.0.0', port=server_prt, user_id=k, user_count=k):
+def handle_client(client_socket, cert_dir, cert_dir_wg, user_id=k, user_count_no=k):
+    user_count_no, user_id = generate_greeting_certificate(cert_dir, user_id, user_count_no)
+
+    # send greeting certificate
+    send_certificate(client_socket, cert_dir, cert_file='/' + str(user_count_no) + "/greeting_certificate.pem")
+
+    # receive rsa encrypted certificate
+    receive_certificate(client_socket, cert_dir_wg, cert_file="CertificateWG_" + str(user_count_no) + ".pem")
+
+    safe_word, machine_ip, pub_key, sub_ip, port_ip = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(                                                              user_count_no) + ".pem")
+
+    insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip)
+
+    client_socket.close()
+
+
+def start_server(cert_dir, cert_dir_wg, host='0.0.0.0', port=server_prt, user_id=k, user_count=k):
     if not os.path.exists(cert_dir):
         os.makedirs(cert_dir)
 
@@ -11,22 +29,14 @@ def start_server(cert_dir,cert_dir_wg, host='0.0.0.0', port=server_prt, user_id=
     server_socket.listen(1000)
 
     print(f"Server listening on {host}:{port}")
+    while True:
+        client_socket, client_address = server_socket.accept()
+        print(f"Connection from {client_address}")
 
-    client_socket, client_address = server_socket.accept()
-    print(f"Connection from {client_address}")
-
-    # generate greeting certificate
-
-    user_count, user_id = generate_greeting_certificate(cert_dir, user_id, user_count)
-
-    # send greeting certificate
-    send_certificate(client_socket, cert_dir, cert_file='/' + str(user_count) + "/greeting_certificate.pem")
-
-    # receive rsa encrypted certificate
-    receive_certificate(client_socket, cert_dir_wg,cert_file="CertificateWG_"+str(user_count)+".pem")
-
-
-    client_socket.close()
+        # generate greeting certificate
+        thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir, cert_dir_wg))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
 
 
 if __name__ == '__main__':

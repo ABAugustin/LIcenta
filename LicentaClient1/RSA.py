@@ -49,14 +49,3 @@ def rsa_decrypt(p, q, cyphertext, e):
     decrypted_text = ''.join([chr((putere(char, d) % N)) for char in cyphertext])
     return decrypted_text
 
-if __name__ == '__main__':
-    print('p = ')
-    p = int(input())
-    print('q = ')
-    q = int(input())
-    print("plaintext = ")
-    plaintext = input()
-    cyphertext, e = rsa_encrypt(p, q, plaintext)
-    print(f"\n\nCiphertext = {cyphertext}")
-    decrypt = rsa_decrypt(p, q, cyphertext, e)
-    print(f"\nDecrypted text = {decrypt}")

@@ -46,17 +46,19 @@ def generate_d(p,q,e):
 def rsa_decrypt(p, q, cyphertext, e):
     N = p * q
     d=generate_d(p,q,e)
-    decrypted_text = ''.join([chr((putere(char, d) % N)) for char in cyphertext])
+    decrypted_text = ''.join([chr((putere(ord(char), d) % N)) for char in cyphertext])
     return decrypted_text
 
 if __name__ == '__main__':
-    print('p = ')
-    p = int(input())
-    print('q = ')
-    q = int(input())
-    print("plaintext = ")
-    plaintext = input()
-    cyphertext, e = rsa_encrypt(p, q, plaintext)
-    print(f"\n\nCiphertext = {cyphertext}")
-    decrypt = rsa_decrypt(p, q, cyphertext, e)
-    print(f"\nDecrypted text = {decrypt}")
+    p = 29
+    q = 47
+    N = p * q
+    k = 0
+    e = generate_e(p, q)
+
+    text="noticeable"
+    print(text)
+    text_c = rsa_encrypt(N,e,text)
+    print(text_c)
+    text_dc= rsa_decrypt(p,q,text_c,e)
+    print(text_dc)

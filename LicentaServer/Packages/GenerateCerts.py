@@ -1,9 +1,11 @@
 from Headers.headers import *
 
 
-def generate_greeting_certificate(cert_dir, user_id, user_count):
+def generate_greeting_certificate(cert_dir, user_id, user_count_no):
     user_id += 1
-    user_count += 1
+    user_count_no += 1
+    if user_id >= 3:
+        user_id = 0
 
     # Generate private key
     key = rsa.generate_private_key(
@@ -24,13 +26,15 @@ def generate_greeting_certificate(cert_dir, user_id, user_count):
     oid_custom_e = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.1")
     oid_custom_n = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.2")
     oid_custom_id = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.3")
-    e_rsa = str(generate_e(p, q))
+    e_rsa = str(e)
     n_rsa = str(N)
 
     # Create custom extensions
     custom_extension_1 = x509.UnrecognizedExtension(oid_custom_e, bytes(e_rsa, 'utf-8'))
     custom_extension_2 = x509.UnrecognizedExtension(oid_custom_n, bytes(n_rsa, 'utf-8'))
-    custom_extension_3 = x509.UnrecognizedExtension(oid_custom_id, bytes(str(user_count), 'utf-8'))
+    custom_extension_3 = x509.UnrecognizedExtension(oid_custom_id, bytes(str(user_id), 'utf-8'))
+
+
 
     # Build the certificate
     cert = (
@@ -63,7 +67,7 @@ def generate_greeting_certificate(cert_dir, user_id, user_count):
 
     print("Private key and certificate with integer extensions created successfully.")
 
-    return user_count, user_id
+    return user_count_no, user_id
 
 
 def check_and_create_folder(cert_dir, folder_name):

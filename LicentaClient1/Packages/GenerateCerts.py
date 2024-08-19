@@ -1,5 +1,5 @@
 from Packages.CertOperations import *
-
+from Headers.headers import *
 
 def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, safe_word, cert_dir_wg):
     # Generate private key
@@ -7,6 +7,7 @@ def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, 
         public_exponent=65537,
         key_size=2048,
     )
+
 
     # Create subject and issuer (self-signed, so they are the same)
     subject = issuer = x509.Name([
@@ -92,7 +93,7 @@ def create_wireguard_certificate(cert_dir, cert_dir_wg):
     machine_ip = subprocess.run(["hostname", "--all-ip-addresses"],
                                 capture_output=True, text=True).stdout.strip().split()[0]
     # extract rsa data
-    e_val, n_val, id_user = extract_greeting_cert_extension_data(cert_dir, "/greeting_certificate.pem")
+    n_val, e_val, id_user = extract_greeting_cert_extension_data(cert_dir, "/greeting_certificate.pem")
 
     # generate and get wg keys and get wg public key in var
     # ps = subprocess.Popen(('echo',"abelbossu"), stdout=subprocess.PIPE)

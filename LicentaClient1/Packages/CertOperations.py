@@ -1,17 +1,20 @@
+
 from Headers.headers import *
 
 
 def load_certificate(cert_path):
     with open(cert_path, "rb") as cert_file:
         cert_data = cert_file.read()
-        cert = x509.load_pem_x509_certificate(cert_data, default_backend())
+        cert = x509.load_pem_x509_certificate(cert_data)
 
     return cert
 
 
 def extract_greeting_cert_extension_data(cert_path, cert_file):
     cert = load_certificate(cert_path+cert_file)
-
+    custom_e_value = ""
+    custom_n_value = ""
+    custom_user_value = ""
     # Extract extensions
     for ext in cert.extensions:
         oid = ext.oid
