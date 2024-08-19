@@ -1,12 +1,12 @@
 import threading
 class ConnectionHandler:
-    def __init__(self, initial_user_count_no=1):
-        self.user_count_no = initial_user_count_no
+    def __init__(self):
+        self.user_count_no = 1
         self.lock = threading.Lock()
 
     def toggle_user_count(self):
         with self.lock:
-            # Toggle the user_count_no between 1 and 2
+            # Ensure user_count_no toggles between 1 and 2
             if self.user_count_no == 1:
                 self.user_count_no = 2
             else:
