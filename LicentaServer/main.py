@@ -1,9 +1,11 @@
 from Packages.CertOperations import extract_wg_cert_extension_data
+from Packages.ConnectionHandler import ConnectionHandler
 from Packages.MongoMethods import insert_data_into_db
 from Packages.SandRCerts import *
 
 
-def handle_client(client_socket, cert_dir, cert_dir_wg, user_id=k, user_count_no=k):
+def handle_client(client_socket, cert_dir, cert_dir_wg, user_id=k):
+    user_count_no = connection_handler.toggle_user_count()
     user_count_no, user_id = generate_greeting_certificate(cert_dir, user_id, user_count_no)
 
     # send greeting certificate
@@ -19,7 +21,7 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, user_id=k, user_count_no
     client_socket.close()
 
 
-def start_server(cert_dir, cert_dir_wg, host='0.0.0.0', port=server_prt, user_id=k, user_count=k):
+def start_server(cert_dir, cert_dir_wg, host='0.0.0.0', port=server_prt):
     if not os.path.exists(cert_dir):
         os.makedirs(cert_dir)
 
@@ -40,5 +42,6 @@ def start_server(cert_dir, cert_dir_wg, host='0.0.0.0', port=server_prt, user_id
 
 
 if __name__ == '__main__':
+    connection_handler = ConnectionHandler()
     start_server(cert_dir="/home/augu/Documents/GitHub/LIcenta/LicentaServer/Certificates",
                  cert_dir_wg="/home/augu/Documents/GitHub/LIcenta/LicentaServer/CertificatesWG")
