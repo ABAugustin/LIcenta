@@ -2,7 +2,7 @@ from Headers.headers import *
 
 
 def generate_greeting_certificate(cert_dir, user_ip_no, user_count_no):
-    user_count_no += 1
+
 
     # Generate private key
     key = rsa.generate_private_key(
@@ -64,7 +64,7 @@ def generate_greeting_certificate(cert_dir, user_ip_no, user_count_no):
 
     print("Private key and certificate with integer extensions created successfully.")
 
-    return user_count_no, user_ip_no
+
 
 
 def check_and_create_folder(cert_dir, folder_name):

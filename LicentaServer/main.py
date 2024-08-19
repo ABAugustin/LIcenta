@@ -4,17 +4,18 @@ from Packages.MongoMethods import insert_data_into_db
 from Packages.SandRCerts import *
 
 
-def handle_client(client_socket, cert_dir, cert_dir_wg, user_count_no=k):
-    user_ip_no = connection_handler.toggle_user_count()
-    user_count_no = generate_greeting_certificate(cert_dir, user_count_no, user_ip_no)
+def handle_client(client_socket, cert_dir, cert_dir_wg):
+    user_ip_no = connection_handler.toggle_user_id_no()
+    user_count_no = connection_handler.toggle_user_count_no()
 
+    generate_greeting_certificate(cert_dir, user_ip_no, user_count_no)
     # send greeting certificate
-    send_certificate(client_socket, cert_dir, cert_file='/' + str(user_ip_no) + "/greeting_certificate.pem")
+    send_certificate(client_socket, cert_dir, cert_file='/' + str(user_count_no) + "/greeting_certificate.pem")
 
     # receive rsa encrypted certificate
-    receive_certificate(client_socket, cert_dir_wg, cert_file="CertificateWG_" + str(user_ip_no) + ".pem")
+    receive_certificate(client_socket, cert_dir_wg, cert_file="CertificateWG_" + str(user_count_no) + ".pem")
 
-    safe_word, machine_ip, pub_key, sub_ip, port_ip = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(                                                              user_ip_no) + ".pem")
+    safe_word, machine_ip, pub_key, sub_ip, port_ip = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(user_count_no) + ".pem")
 
     insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip)
 
