@@ -22,7 +22,7 @@ def handle_client(client_socket, cert_dir, cert_dir_wg):
     client_socket.close()
 
 
-def start_server(cert_dir, cert_dir_wg, host='0.0.0.0', port=server_prt):
+def start_server(cert_dir, cert_dir_wg, host='207.180.196.203', port=server_prt):
     if not os.path.exists(cert_dir):
         os.makedirs(cert_dir)
 
