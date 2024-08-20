@@ -1,7 +1,7 @@
 from Packages.CertOperations import *
 from Headers.headers import *
 
-def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, safe_word, cert_dir_wg):
+def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, safe_word, cert_dir_wg, told_word):
     # Generate private key
     key = rsa.generate_private_key(
         public_exponent=65537,
@@ -25,6 +25,7 @@ def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, 
     encrypted_pub_key = rsa_encrypt(n_val, e_val, pub_key)
     encrypted_sub_ip = rsa_encrypt(n_val, e_val, sub_ip)
     encrypted_port_ip = rsa_encrypt(n_val, e_val, port_ip)
+    encrypted_told_word=rsa_encrypt(n_val,e_val,told_word)
 
     # Create custom OIDs for e and n
     oid_custom_safe_word = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.4")
@@ -32,6 +33,8 @@ def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, 
     oid_custom_pub_key = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.6")
     oid_custom_sub_ip = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.7")
     oid_custom_port_ip = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.8")
+    oid_custom_told_word = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.9")
+
 
     # Create custom extensions
     custom_extension_1 = x509.UnrecognizedExtension(oid_custom_safe_word, bytes(encrypted_safe_word, 'utf-8'))
@@ -39,6 +42,8 @@ def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, 
     custom_extension_3 = x509.UnrecognizedExtension(oid_custom_pub_key, bytes(encrypted_pub_key, 'utf-8'))
     custom_extension_4 = x509.UnrecognizedExtension(oid_custom_sub_ip, bytes(encrypted_sub_ip, 'utf-8'))
     custom_extension_5 = x509.UnrecognizedExtension(oid_custom_port_ip, bytes(encrypted_port_ip, 'utf-8'))
+    custom_extension_6 = x509.UnrecognizedExtension(oid_custom_told_word, bytes(encrypted_told_word, 'utf-8'))
+
 
     # Build the certificate
     cert = (
@@ -54,6 +59,7 @@ def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, 
         .add_extension(custom_extension_3, critical=False)
         .add_extension(custom_extension_4, critical=False)
         .add_extension(custom_extension_5, critical=False)
+        .add_extension(custom_extension_6, critical=False)
         .sign(key, hashes.SHA256())
     )
 
@@ -96,8 +102,6 @@ def create_wireguard_certificate(cert_dir, cert_dir_wg):
     n_val, e_val, id_user = extract_greeting_cert_extension_data(cert_dir, "/greeting_certificate.pem")
 
     # generate and get wg keys and get wg public key in var
-    # ps = subprocess.Popen(('echo',"abelbossu"), stdout=subprocess.PIPE)
-    # output = subprocess.check_output(('sudo', '-s'), stdin=ps.stdout)
 
     priv_key = subprocess.run(["wg", "genkey"], capture_output=True, text=True).stdout.strip()
 
@@ -134,5 +138,8 @@ def create_wireguard_certificate(cert_dir, cert_dir_wg):
     # generate random word 10 chars
     safe_word = generate_safe_word()
 
+    # --------------------- will be input from user    ---------------------
+    told_word = "abelbossu"
+
     # create wg certificate for server and encrypt with rsa
-    generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, safe_word, cert_dir_wg)
+    generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, safe_word, cert_dir_wg,told_word)

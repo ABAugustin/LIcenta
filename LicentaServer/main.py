@@ -1,6 +1,6 @@
 from Packages.CertOperations import extract_wg_cert_extension_data
 from Packages.ConnectionHandler import ConnectionHandler
-from Packages.MongoMethods import insert_data_into_db
+from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db
 from Packages.SandRCerts import *
 
 
@@ -15,9 +15,11 @@ def handle_client(client_socket, cert_dir, cert_dir_wg):
     # receive rsa encrypted certificate
     receive_certificate(client_socket, cert_dir_wg, cert_file="CertificateWG_" + str(user_count_no) + ".pem")
 
-    safe_word, machine_ip, pub_key, sub_ip, port_ip = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(user_count_no) + ".pem")
+    safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(user_count_no) + ".pem")
 
-    insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip)
+    insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
+
+    create_match_safe_words_db()
 
     client_socket.close()
 
