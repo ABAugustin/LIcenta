@@ -36,7 +36,7 @@ def insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_wo
 
 
 def create_match_safe_words_db():
-    coll_clients, client_cli = connect_to_database_clients
+    coll_clients, client_cli = connect_to_database_clients()
     coll_matches, client_matches = connect_to_database_matches()
 
     documents = list(coll_clients.find())
@@ -51,16 +51,16 @@ def create_match_safe_words_db():
             if doc2["_id"] in visited or doc1["_id"] == doc2["_id"]:
                 continue
             if doc1["securityCodeDest"] == doc2["securityCodeExp"] and doc2["securityCodeDest"] == doc1["securityCodeExp"] and doc1["checked"] == "0" and doc2["checked"] == "0":
-                if doc1["port"] == doc2["port"]:
-                    doc1["port"] = "10.0.0.1"
-                    doc2["port"] = "10.0.0.2"
+                if doc1["endpoint"] == doc2["endpoint"]:
+                    doc1["endpoint"] = "10.0.0.1"
+                    doc2["endpoint"] = "10.0.0.2"
 
                 coll_clients.update_one(
-                    doc1["_id"],
+                    {"_id": doc1["_id"]},
                     {"$set": {"checked": "1"}}
                 )
                 coll_clients.update_one(
-                    doc2["_id"],
+                    {"_id": doc2["_id"]},
                     {"$set": {"checked": "1"}}
                 )
 

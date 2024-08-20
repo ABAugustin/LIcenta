@@ -46,5 +46,5 @@ def start_server(cert_dir, cert_dir_wg, host='207.180.196.203', port=server_prt)
 
 if __name__ == '__main__':
     connection_handler = ConnectionHandler()
-    start_server(cert_dir="/home/augu/Documents/GitHub/LIcenta/LicentaServer/Certificates",
-                 cert_dir_wg="/home/augu/Documents/GitHub/LIcenta/LicentaServer/CertificatesWG")
+    start_server(cert_dir="/home/augu/LIcenta/LicentaServer/Certificates",
+                 cert_dir_wg="/home/augu/LIcenta/LicentaServer/CertificatesWG")
