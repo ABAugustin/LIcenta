@@ -137,7 +137,8 @@ def create_wireguard_certificate(cert_dir, cert_dir_wg):
 
 
     # generate random word 10 chars
-    safe_word = generate_safe_word()
+    #safe_word = generate_safe_word()
+    safe_word = "abelbossu"
 
     # --------------------- will be input from user    ---------------------
     told_word = "abelbossu"
