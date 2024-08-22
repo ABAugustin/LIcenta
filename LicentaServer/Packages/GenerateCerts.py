@@ -98,7 +98,7 @@ def generate_pair_certificate(cert_dir,machine_ip, safe_word , pub_key, port_ip,
 
 
     print("inaint de apel get pair data")
-    
+
     print(pub_key)
     print(machine_ip)
     print(safe_word)
