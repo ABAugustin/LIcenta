@@ -28,7 +28,7 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
 
     create_match_safe_words_db()
 
-    generate_pair_certificate(cert_dir_pair, machine_ip, pub_key, port_ip, told_word,user_count_no)
+    generate_pair_certificate(cert_dir_pair, machine_ip, safe_word,pub_key, port_ip, told_word, user_count_no)
 
     send_certificate(client_socket, cert_dir_pair, cert_file='/' + str(user_count_no) + "/pair_certificate.pem")
 
