@@ -95,6 +95,8 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
         ]
     })
 
+    print(document)
+
     if document:
         if (document["pair_1"]["publicKey"] == publicKey and
                 document["pair_1"]["ipAddress"] == ipAddress and
