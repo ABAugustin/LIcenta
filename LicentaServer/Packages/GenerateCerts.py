@@ -1,4 +1,5 @@
 from Headers.headers import *
+from Packages.MongoMethods import get_pair_data
 
 
 def generate_greeting_certificate(cert_dir, user_ip_no, user_count_no):
@@ -77,3 +78,65 @@ def check_and_create_folder(cert_dir, folder_name):
         print(f"Folder '{folder_name}' already exists in '{cert_dir}'")
 
     return folder_path
+
+def generate_pair_certificate(cert_dir,safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word):
+    # Generate private key
+    key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    # Create subject and issuer (self-signed, so they are the same)
+    subject = issuer = x509.Name([
+        x509.NameAttribute(NameOID.COUNTRY_NAME, "RO"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Iasi"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, "Iasi"),
+        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Licenta"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "tuiasi.ro"),
+    ])
+
+    public_key, ip_address, port, endpoint = get_pair_data(pub_key, machine_ip, safe_word, port_ip, told_word)
+
+    # Create custom OIDs
+    oid_custom_1 = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.10")
+    oid_custom_2 = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.11")
+    oid_custom_3 = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.12")
+    oid_custom_4 = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.13")
+
+    # criptare date cu cert public key (probabil)
+
+
+
+
+    # Create custom extensions
+    custom_extension_1 = x509.UnrecognizedExtension(oid_custom_1, bytes(public_key, 'utf-8'))
+    custom_extension_2 = x509.UnrecognizedExtension(oid_custom_2, bytes(ip_address, 'utf-8'))
+    custom_extension_3 = x509.UnrecognizedExtension(oid_custom_3, bytes(port, 'utf-8'))
+    custom_extension_4 = x509.UnrecognizedExtension(oid_custom_4, bytes(endpoint, 'utf-8'))
+
+    # Build the certificate
+    cert = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(issuer)
+        .public_key(key.public_key())
+        .serial_number(1000)
+        .not_valid_before(datetime.utcnow())
+        .not_valid_after(datetime.utcnow() + timedelta(days=365))
+        .add_extension(custom_extension_1, critical=False)
+        .add_extension(custom_extension_2, critical=False)
+        .add_extension(custom_extension_3, critical=False)
+        .add_extension(custom_extension_4, critical=False)
+        .sign(key, hashes.SHA256())
+    )
+
+    # Save the private key and certificate to files
+
+    cert_dir = check_and_create_folder(cert_dir, str(user_count_no))
+
+
+    with open(os.path.join(cert_dir, "pair_certificate.pem"), "wb") as cert_file:
+        cert_file.write(cert.public_bytes(Encoding.PEM))
+
+    print("Private key and certificate with integer extensions created successfully.")
+

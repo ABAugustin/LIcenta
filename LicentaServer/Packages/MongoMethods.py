@@ -74,3 +74,45 @@ def create_match_safe_words_db():
 
     client_cli.close()
     client_matches.close()
+
+
+def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp):
+    collection, client = connect_to_database_matches()
+
+    document = collection.find_one({
+        "$or": [
+            {"pair_1.publicKey": publicKey,
+             "pair_1.ipAddress": ipAddress,
+             "pair_1.securityCodeDest": securityCodeDest,
+             "pair_1.port": port,
+             "pair_1.securityCodeExp": securityCodeExp},
+
+            {"pair_2.publicKey": publicKey,
+             "pair_2.ipAddress": ipAddress,
+             "pair_2.securityCodeDest": securityCodeDest,
+             "pair_2.port": port,
+             "pair_2.securityCodeExp": securityCodeExp}
+        ]
+    })
+
+    if document:
+        if (document["pair_1"]["publicKey"] == publicKey and
+                document["pair_1"]["ipAddress"] == ipAddress and
+                document["pair_1"]["securityCodeDest"] == securityCodeDest and
+                document["pair_1"]["port"] == port and
+                document["pair_1"]["securityCodeExp"] == securityCodeExp):
+            other_pair = document["pair_2"]
+        else:
+            other_pair = document["pair_1"]
+
+        client.close()
+
+        print(other_pair)
+
+        print(f"PublicKey: {other_pair['publicKey']}")
+        print(f"IPAddress: {other_pair['ipAddress']}")
+        print(f"Port: {other_pair['port']}")
+        print(f"Endpoint: {other_pair['endpoint']}")
+
+        return (other_pair["publicKey"], other_pair["ipAddress"],
+                other_pair["port"], other_pair["endpoint"])

@@ -4,7 +4,7 @@ from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_d
 from Packages.SandRCerts import *
 
 
-def handle_client(client_socket, cert_dir, cert_dir_wg):
+def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
     user_ip_no = connection_handler.toggle_user_id_no()
     user_count_no = connection_handler.toggle_user_count_no()
 
@@ -16,15 +16,22 @@ def handle_client(client_socket, cert_dir, cert_dir_wg):
     receive_certificate(client_socket, cert_dir_wg, cert_file="CertificateWG_" + str(user_count_no) + ".pem")
 
     safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(user_count_no) + ".pem")
-
+    print(safe_word)
+    print(machine_ip)
+    print(pub_key)
+    print(sub_ip)
+    print(port_ip)
+    print(told_word)
     insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
 
     create_match_safe_words_db()
 
+    generate_pair_certificate(cert_dir_pair, machine_ip, pub_key, sub_ip, port_ip, told_word)
+
     client_socket.close()
 
-
-def start_server(cert_dir, cert_dir_wg, host='207.180.196.203', port=server_prt):
+    #207.180.196.203
+def start_server(cert_dir, cert_dir_wg, cert_dir_pair, host='207.180.196.203', port=server_prt):
     if not os.path.exists(cert_dir):
         os.makedirs(cert_dir)
 
@@ -39,7 +46,7 @@ def start_server(cert_dir, cert_dir_wg, host='207.180.196.203', port=server_prt)
         print(f"Connection from {client_address}")
 
         # generate greeting certificate
-        thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir, cert_dir_wg))
+        thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir, cert_dir_wg, cert_dir_pair))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
 
@@ -47,4 +54,5 @@ def start_server(cert_dir, cert_dir_wg, host='207.180.196.203', port=server_prt)
 if __name__ == '__main__':
     connection_handler = ConnectionHandler()
     start_server(cert_dir="/home/augu/LIcenta/LicentaServer/Certificates",
-                 cert_dir_wg="/home/augu/LIcenta/LicentaServer/CertificatesWG")
+                 cert_dir_wg="/home/augu/LIcenta/LicentaServer/CertificatesWG",
+                 cert_dir_pair="/home/augu/LIcenta/LicentaServer/CertificatesPair")

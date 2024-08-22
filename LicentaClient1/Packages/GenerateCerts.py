@@ -18,6 +18,7 @@ def generate_wg_certificate(machine_ip, e_val, n_val, pub_key, sub_ip, port_ip, 
         x509.NameAttribute(NameOID.COMMON_NAME, "tuiasi.ro"),
     ])
 
+
     # Criptare safe-word, machine_ip, pub_key, sub_ip, port_ip
 
     encrypted_safe_word = rsa_encrypt(n_val, e_val, safe_word)

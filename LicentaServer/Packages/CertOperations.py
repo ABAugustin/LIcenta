@@ -18,7 +18,7 @@ def extract_wg_cert_extension_data(cert_path, cert_file):
     pub_key = ""
     sub_ip = ""
     port_ip = ""
-    told_word=""
+    told_word = ""
     # Extract extensions
     for ext in cert.extensions:
         oid = ext.oid
@@ -55,3 +55,4 @@ def extract_wg_cert_extension_data(cert_path, cert_file):
     told_word_dec = rsa_decrypt(p, q, told_word, e)
 
     return safe_word_dec, machine_ip_dec, pub_key_dec, sub_ip_dec, port_ip_dec,told_word_dec
+
