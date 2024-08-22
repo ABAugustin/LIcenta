@@ -16,17 +16,21 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
     receive_certificate(client_socket, cert_dir_wg, cert_file="CertificateWG_" + str(user_count_no) + ".pem")
 
     safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(user_count_no) + ".pem")
+
     print(safe_word)
     print(machine_ip)
     print(pub_key)
     print(sub_ip)
     print(port_ip)
     print(told_word)
+
     insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
 
     create_match_safe_words_db()
 
-    generate_pair_certificate(cert_dir_pair, machine_ip, pub_key, sub_ip, port_ip, told_word)
+    generate_pair_certificate(cert_dir_pair, machine_ip, pub_key, port_ip, told_word,user_count_no)
+
+    send_certificate(client_socket, cert_dir_pair, cert_file='/' + str(user_count_no) + "/pair_certificate.pem")
 
     client_socket.close()
 

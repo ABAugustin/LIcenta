@@ -79,7 +79,7 @@ def check_and_create_folder(cert_dir, folder_name):
 
     return folder_path
 
-def generate_pair_certificate(cert_dir,safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word):
+def generate_pair_certificate(cert_dir,safe_word, machine_ip, pub_key, port_ip, told_word, user_count_no):
     # Generate private key
     key = rsa.generate_private_key(
         public_exponent=65537,
