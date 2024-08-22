@@ -114,6 +114,5 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
         print(f"Port: {other_pair['port']}")
         print(f"Endpoint: {other_pair['endpoint']}")
 
-        # return (other_pair["publicKey"], other_pair["ipAddress"],
-        #         other_pair["port"], other_pair["endpoint"])
-        return 0
+        return other_pair["publicKey"], other_pair["ipAddress"],
+                other_pair["port"], other_pair["endpoint"]
