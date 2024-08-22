@@ -106,7 +106,7 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
             other_pair = document["pair_1"]
 
         client.close()
-
+        print("aici")
         print(other_pair)
 
         print(f"PublicKey: {other_pair['publicKey']}")
