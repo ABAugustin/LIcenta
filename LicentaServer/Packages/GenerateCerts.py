@@ -98,6 +98,11 @@ def generate_pair_certificate(cert_dir,machine_ip, safe_word , pub_key, port_ip,
 
     public_key, ip_address, port, endpoint = get_pair_data(pub_key, machine_ip, safe_word, port_ip, told_word)
 
+    print(pub_key)
+    print(ip_address)
+    print(port)
+    print(endpoint)
+
     # Create custom OIDs
     oid_custom_1 = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.10")
     oid_custom_2 = ObjectIdentifier("1.3.6.1.4.1.11129.2.5.11")

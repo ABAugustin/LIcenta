@@ -17,12 +17,6 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
 
     safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = extract_wg_cert_extension_data(cert_dir_wg,cert_file="/CertificateWG_" + str(user_count_no) + ".pem")
 
-    print(safe_word)
-    print(machine_ip)
-    print(pub_key)
-    print(sub_ip)
-    print(port_ip)
-    print(told_word)
 
     insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
 
