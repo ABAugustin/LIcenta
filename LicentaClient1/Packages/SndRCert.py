@@ -12,13 +12,11 @@ def receive_certificate(server_socket, cert_dir, cert_file):
     print("Server certificate received and saved")
 
 
-def send_certificate(server_socket, cert_dir, cert_file):
-    cert_file_path = cert_dir + cert_file
-    with open(cert_file_path, 'rb') as f:
-        while True:
-            data = f.read(1024)
-            if not data:
-                break
-            server_socket.sendall(data)
+def send_dto(server_socket, dto):
+    chunk_size = 1024
+    for i in range(0, len(dto), chunk_size):
+        chunk = dto[i:i + chunk_size]
+        server_socket.sendall(chunk)
     server_socket.shutdown(socket.SHUT_WR)
-    print("Client certificate sent to server")
+    print("dto sent successfully")
+

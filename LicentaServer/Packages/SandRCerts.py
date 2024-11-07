@@ -1,8 +1,6 @@
 from Headers.headers import *
 from Packages.GenerateCerts import *
 
-
-
 def send_certificate(server_socket, cert_dir, cert_file):
     cert_file_path = cert_dir + cert_file
 

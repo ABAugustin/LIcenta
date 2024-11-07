@@ -15,6 +15,16 @@ from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat
 from datetime import datetime, timedelta
 from RSA import *
 import re
+from cryptography.hazmat.primitives.asymmetric import padding
+
+
+# Prime and generator as specified in RFC 3526, 2048-bit MODP Group #14
+p_dh = int("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1"
+        "29024E088A67CC74020BBEA63B139B22514A08798E3404D"
+        "DEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C2"
+        "45E485B576625E7EC6F44C42E9A63A36210000000000090563", 16)
+g_dh = 2  # The generator for this group is typically 2
+
 
 
 # global data for now
