@@ -8,7 +8,7 @@ from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_d
 from Packages.SandRCerts import *
 
 
-def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
+def handle_client(client_socket, cert_dir):
     user_ip_no = connection_handler.toggle_user_id_no()
     user_count_no = connection_handler.toggle_user_count_no()
 
@@ -26,16 +26,19 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
     server_public_key_dh = dh_generate_public_key(server_private_key_dh)
 
     # receive and decrypt client dh key
-    encrypted_client_public_key_dh = client_socket.recv(1024)
-    client_public_key_dh = int.from_bytes(
-        private_key.decrypt(
-            encrypted_client_public_key_dh,
-            padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
-        ), "big"
+    encrypted_client_public_key_dh = client_socket.recv(512)
+    client_public_key_dh_bytes = private_key.decrypt(
+        encrypted_client_public_key_dh,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
     )
+
     # encrypt and send server dh public key
-    encrypted_server_public_key_dh = int.to_bytes(server_public_key_dh, 256, "big")
-    client_socket.sendall(encrypted_server_public_key_dh)
+    client_public_key_dh = int.from_bytes(client_public_key_dh_bytes, "big")
+    client_socket.sendall(client_public_key_dh)
 
     # compute the session key
 
@@ -81,7 +84,7 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
     client_socket.close()
 
     #207.180.196.203
-def start_server(cert_dir, host='207.180.196.203', port=server_prt):
+def start_server(cert_dir, host='0.0.0.0', port=server_prt):
     if not os.path.exists(cert_dir):
         os.makedirs(cert_dir)
 
@@ -103,4 +106,4 @@ def start_server(cert_dir, host='207.180.196.203', port=server_prt):
 
 if __name__ == '__main__':
     connection_handler = ConnectionHandler()
-    start_server(cert_dir="/home/augu/LIcenta/LicentaServer/Certificates")
+    start_server(cert_dir="/home/augu/Documents/GitHub/LIcenta/LicentaServer/Certificates")

@@ -17,6 +17,8 @@ def connect_to_server(server_ip, server_port, cert_dir):
         receive_certificate(server_socket, cert_dir, cert_file="greeting_certificate.pem")
         grt_cert = load_certificate(cert_dir)
         public_key_server, user_id = get_grt_cert_pkey_and_id(grt_cert)
+
+
         #!!!!!!!!!!!!!!!!!!!! ---- Start Diffie Hellman ----- !!!!!!!!!!!!!!!!!!!!!
         #diffie hellman
 
@@ -24,10 +26,16 @@ def connect_to_server(server_ip, server_port, cert_dir):
         client_private_key_dh = dh_generate_private_key()
         client_public_key_dh = dh_generate_public_key(client_private_key_dh)
 
+        client_public_key_dh_bytes = client_public_key_dh.to_bytes((client_public_key_dh.bit_length() + 7) // 8, "big")
+
         #encrypt dh public key and send to server
         encrypted_client_public_key_dh = public_key_server.encrypt(
-            int.to_bytes(client_public_key_dh, 256, "big"),
-            padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
+            client_public_key_dh_bytes,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
         )
         server_socket.sendall(encrypted_client_public_key_dh)
 
@@ -78,5 +86,5 @@ def connect_to_server(server_ip, server_port, cert_dir):
     server_socket.close()
 
 if __name__ == '__main__':
-    connect_to_server(server_ip="207.180.196.203", server_port=server_prt,
+    connect_to_server(server_ip="0.0.0.0", server_port=server_prt,
                       cert_dir="/home/augu/Documents/GitHub/LIcenta/LicentaClient1/Certificates")
