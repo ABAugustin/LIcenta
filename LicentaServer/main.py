@@ -96,7 +96,7 @@ def start_server(cert_dir, host='207.180.196.203', port=server_prt):
         print(f"Connection from {client_address}")
 
         # generate greeting certificate
-        thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir, cert_dir_wg, cert_dir_pair))
+        thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
 
