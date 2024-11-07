@@ -7,7 +7,7 @@ from Packages.SndRCert import *
 from Wireguard.Wireguard import *
 
 
-def connect_to_server(server_ip, server_port, cert_dir, cert_dir_wg):
+def connect_to_server(server_ip, server_port, cert_dir):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.connect((server_ip, server_port))
 

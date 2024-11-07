@@ -3,7 +3,6 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from DTOs.DTOOperations import receive_dto_data, decrypt_dto_data, extract_wg_dto_data, send_dto
 from DTOs.PairDTO import PairDTO
 from DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
-from Packages.CertOperations import extract_wg_cert_extension_data
 from Packages.ConnectionHandler import ConnectionHandler
 from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db
 from Packages.SandRCerts import *
@@ -82,7 +81,7 @@ def handle_client(client_socket, cert_dir, cert_dir_wg, cert_dir_pair):
     client_socket.close()
 
     #207.180.196.203
-def start_server(cert_dir, cert_dir_wg, cert_dir_pair, host='207.180.196.203', port=server_prt):
+def start_server(cert_dir, host='207.180.196.203', port=server_prt):
     if not os.path.exists(cert_dir):
         os.makedirs(cert_dir)
 

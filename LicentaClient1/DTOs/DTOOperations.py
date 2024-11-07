@@ -3,7 +3,7 @@ import json
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
-import PairDTO
+from DTOs import PairDTO
 
 
 def receive_dto_data(client_socket):
