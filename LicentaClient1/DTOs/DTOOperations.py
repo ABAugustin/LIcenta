@@ -3,7 +3,7 @@ import json
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
-from DTOs import PairDTO
+from DTOs.PairDTO import PairDTO
 
 
 def receive_dto_data(client_socket):
@@ -14,7 +14,6 @@ def receive_dto_data(client_socket):
         if not chunk:  # End of data
             break
         data_chunks.append(chunk)
-
     # Join all chunks to form the complete data
     data = b''.join(data_chunks)
     return data
@@ -41,5 +40,17 @@ def send_dto(server_socket, dto):
     for i in range(0, len(dto), chunk_size):
         chunk = dto[i:i + chunk_size]
         server_socket.sendall(chunk)
-    server_socket.shutdown(socket.SHUT_WR)
     print("dto sent successfully")
+
+def clear_buffer(client_socket):
+    client_socket.settimeout(0.1)  # Set a short timeout to avoid blocking
+    try:
+        while True:
+            leftover = client_socket.recv(1024)
+            if not leftover:
+                break
+    except socket.timeout:
+        pass  # Expected timeout, as no more data is incoming
+    finally:
+        client_socket.settimeout(None)  # Reset timeout to default
+

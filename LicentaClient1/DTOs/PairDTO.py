@@ -24,3 +24,4 @@ class PairDTO:
             port=data.get("port"),
             endpoint=data.get("endpoint")
         )
+

@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 from RSA import *
 import re
 from cryptography.hazmat.primitives.asymmetric import padding
-
+import struct
 
 # Prime and generator as specified in RFC 3526, 2048-bit MODP Group #14
 p_dh = int("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E08"

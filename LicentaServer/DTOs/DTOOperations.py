@@ -15,7 +15,7 @@ def receive_dto_data(client_socket):
         if not chunk:  # End of data
             break
         data_chunks.append(chunk)
-
+    client_socket.shutdown(socket.SHUT_WR)
     # Join all chunks to form the complete data
     data = b''.join(data_chunks)
     return data
@@ -33,7 +33,7 @@ def decrypt_dto_data(encrypted_data, private_key):
     return decrypted_data
 
 def extract_wg_dto_data(decrypted_data):
-    dto_data = json.loads(decrypted_data.decode("utf-8"))
+    dto_data = json.loads(decrypted_data)
     dto = WireguardDTO.from_dict(dto_data)
     return dto
 
@@ -42,5 +42,5 @@ def send_dto(server_socket, dto):
     for i in range(0, len(dto), chunk_size):
         chunk = dto[i:i + chunk_size]
         server_socket.sendall(chunk)
-    server_socket.shutdown(socket.SHUT_WR)
+
     print("dto sent successfully")

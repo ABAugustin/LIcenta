@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat
 from datetime import datetime, timedelta
 import pymongo
 import threading
+import struct
 
 # Prime and generator as specified in RFC 3526, 2048-bit MODP Group #14
 p_dh = int("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E08"
