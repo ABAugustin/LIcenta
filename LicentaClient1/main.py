@@ -117,5 +117,5 @@ def connect_to_server(server_ip, server_port, cert_dir):
     server_socket.close()
 
 if __name__ == '__main__':
-    connect_to_server(server_ip="0.0.0.0", server_port=server_prt,
+    connect_to_server(server_ip="207.180.196.203", server_port=server_prt,
                       cert_dir="/home/augu/Documents/GitHub/LIcenta/LicentaClient1/Certificates")
