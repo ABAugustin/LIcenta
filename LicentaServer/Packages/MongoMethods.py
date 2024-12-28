@@ -1,3 +1,6 @@
+import time
+from asyncio import sleep
+
 import pymongo
 
 
@@ -43,6 +46,10 @@ def create_match_safe_words_db():
 
     paired_documents = []
     visited = set()
+
+    while len(documents) < 2:
+        documents = list(coll_clients.find())
+        time.sleep(1)
 
     for doc1 in documents:
         if doc1["_id"] in visited:

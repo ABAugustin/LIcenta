@@ -87,6 +87,7 @@ def handle_client(client_socket, cert_dir):
     safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = wg_dto.to_tuple()
 
     # AICI TREABA BAZA DE DATE NU MAI STIU
+
     insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
 
     create_match_safe_words_db()
