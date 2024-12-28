@@ -31,7 +31,7 @@ def decrypt_dto_data(encrypted_data, private_key):
     return decrypted_data
 
 def extract_pair_dto_data(decrypted_data):
-    dto_data = json.loads(decrypted_data.decode("utf-8"))
+    dto_data = json.loads(decrypted_data)
     dto = PairDTO.from_dict(dto_data)
     return dto
 
