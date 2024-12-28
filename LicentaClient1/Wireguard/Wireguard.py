@@ -74,9 +74,8 @@ def final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_
     print(ip_address_pair)
     print(port_pair)
     print(endpoint_pair)
-
-   # command = ["wg", "set", "wg0", "peer", str(public_key_pair),"allowed-ips", str(), "wireguard"]
-   # stdout, stderr = run_command_with_sudo(command)
+    command = ["wg", "set", "wg0", "peer", str(public_key_pair),"allowed-ips", str(endpoint_pair) + "/32", "endpoint",str(ip_address_pair)+":"+str(port_pair)]
+    stdout, stderr = run_command_with_sudo(command)
 
 
 
