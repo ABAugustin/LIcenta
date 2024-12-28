@@ -45,23 +45,28 @@ def create_match_safe_words_db():
     documents = list(coll_clients.find())
 
     paired_documents = []
-    visited = set()
 
+    # Ensure there are at least two documents to process
     while len(documents) < 2:
         documents = list(coll_clients.find())
         time.sleep(1)
 
     for doc1 in documents:
-        if doc1["_id"] in visited:
+        if doc1["checked"] != "0":
             continue
         for doc2 in documents:
-            if doc2["_id"] in visited or doc1["_id"] == doc2["_id"]:
+            if doc2["_id"] == doc1["_id"] or doc2["checked"] != "0":
                 continue
-            if doc1["securityCodeDest"] == doc2["securityCodeExp"] and doc2["securityCodeDest"] == doc1["securityCodeExp"] and doc1["checked"] == "0" and doc2["checked"] == "0":
+            if (
+                doc1["securityCodeDest"] == doc2["securityCodeExp"] and
+                doc2["securityCodeDest"] == doc1["securityCodeExp"]
+            ):
+                # Adjust endpoints if they match
                 if doc1["endpoint"] == doc2["endpoint"]:
                     doc1["endpoint"] = "10.0.0.1"
                     doc2["endpoint"] = "10.0.0.2"
 
+                # Update the `checked` field in the database
                 coll_clients.update_one(
                     {"_id": doc1["_id"]},
                     {"$set": {"checked": "1"}}
@@ -71,14 +76,15 @@ def create_match_safe_words_db():
                     {"$set": {"checked": "1"}}
                 )
 
+                # Add the pair to the results
                 paired_documents.append({"pair_1": doc1, "pair_2": doc2})
-                visited.add(doc1["_id"])
-                visited.add(doc2["_id"])
                 break
 
+    # Insert paired documents into the matches collection
     if paired_documents:
         coll_matches.insert_many(paired_documents)
 
+    # Close the database connections
     client_cli.close()
     client_matches.close()
 

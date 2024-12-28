@@ -98,7 +98,8 @@ def connect_to_server(server_ip, server_port, cert_dir):
         #receive pairing dto
 
         pair_dto_encrypted=receive_data(server_socket)
-        print("received pair dto data")
+        print("received pair dto data -- empty object")
+        print(pair_dto_encrypted)
         # decrypt
         # !!!!!!!!!!!!!!!!!!!! ---- start AES -----------------------
 
