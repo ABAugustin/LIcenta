@@ -18,6 +18,10 @@ import re
 from cryptography.hazmat.primitives.asymmetric import padding
 import struct
 
+server_ip="207.180.196.203"
+server_port=1232
+cert_dir="/home/augu/Documents/GitHub/LIcenta/LicentaClient1/Certificates"
+
 # Prime and generator as specified in RFC 3526, 2048-bit MODP Group #14
 p_dh = int("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E08"
            "8A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD", 16)

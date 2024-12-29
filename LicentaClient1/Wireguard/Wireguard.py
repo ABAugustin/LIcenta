@@ -15,7 +15,7 @@ def run_command_with_sudo(command, password="abelbossu"):
     return stdout, stderr
 
 
-def set_up_wireguard(user_id):
+def set_up_wireguard(user_id,safe_word,told_word):
     # get machine ip, public wireguard key, sub-ip with port,
 
     # get machine ip
@@ -60,10 +60,10 @@ def set_up_wireguard(user_id):
 
     # generate random word 10 chars
     #safe_word = generate_safe_word()
-    safe_word = "abelbossu"
+    #safe_word = "abelbossu"
 
     # --------------------- will be input from user    ---------------------
-    told_word = "abelbossu"
+    #told_word = "abelbossu"
 
 
     return safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word
