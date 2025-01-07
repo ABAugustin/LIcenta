@@ -76,6 +76,7 @@ def create_match_safe_words_db():
                     {"$set": {"checked": "1"}}
                 )
 
+
                 # Add the pair to the results
                 paired_documents.append({"pair_1": doc1, "pair_2": doc2})
                 break
@@ -110,11 +111,15 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
 
     print(document)
 
+    # if (document["pair_1"]["publicKey"] == publicKey and
+    #         document["pair_1"]["ipAddress"] == ipAddress and
+    #         document["pair_1"]["securityCodeDest"] == securityCodeDest and
+    #         document["pair_1"]["port"] == port and
+    #         document["pair_1"]["securityCodeExp"] == securityCodeExp):
+
+
     if document:
-        if (document["pair_1"]["publicKey"] == publicKey and
-                document["pair_1"]["ipAddress"] == ipAddress and
-                document["pair_1"]["securityCodeDest"] == securityCodeDest and
-                document["pair_1"]["port"] == port and
+        if (document["pair_1"]["securityCodeDest"] == securityCodeDest and
                 document["pair_1"]["securityCodeExp"] == securityCodeExp):
             other_pair = document["pair_2"]
         else:
@@ -123,10 +128,42 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
         client.close()
         print("aici")
         print(other_pair)
-
         print(f"PublicKey: {other_pair['publicKey']}")
         print(f"IPAddress: {other_pair['ipAddress']}")
         print(f"Port: {other_pair['port']}")
         print(f"Endpoint: {other_pair['endpoint']}")
 
         return (other_pair["publicKey"], other_pair["ipAddress"],other_pair["port"], other_pair["endpoint"])
+
+
+def remove_duplicate_pairs():
+    collection, client = connect_to_database_matches()
+
+    removed_count = 0
+
+    # Fetch all documents
+    documents = list(collection.find())
+
+    # Use a set to track unique pairs
+    unique_pairs = set()
+
+    for doc in documents:
+        # Get pair_1 and pair_2 (as strings to hash them)
+        pair_1 = doc.get("pair_1")
+        pair_2 = doc.get("pair_2")
+
+        # Create a sorted tuple of pair_1 and pair_2 to identify duplicates
+        pair_key = tuple(sorted([str(pair_1), str(pair_2)]))
+
+        if pair_key in unique_pairs:
+            # If the pair already exists, remove the duplicate document
+            collection.delete_one({"_id": doc["_id"]})
+            removed_count += 1
+        else:
+            # Add the pair to the set
+            unique_pairs.add(pair_key)
+
+    # Close connection
+    client.close()
+
+    return removed_count
