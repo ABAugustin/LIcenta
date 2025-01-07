@@ -16,7 +16,6 @@ from Packages.SandRCerts import generate_greeting_certificate, send_certificate,
 import time
 
 # Create a global lock for database operations
-db_lock = threading.Lock()
 
 def handle_client(client_socket, cert_dir):
     try:
@@ -71,14 +70,13 @@ def handle_client(client_socket, cert_dir):
         safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = wg_dto.to_tuple()
 
         # Thread-safe database operations
-        with db_lock:
-            print("Performing thread-safe database operations...")
-            insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
-            time.sleep(0.1)
-            create_match_safe_words_db()
-            time.sleep(0.1)
-            remove_duplicate_pairs()
-            time.sleep(0.1)
+
+        insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
+
+        create_match_safe_words_db()
+
+        #remove_duplicate_pairs()
+
 
         public_key, ip_address, port, endpoint = get_pair_data(pub_key, machine_ip, safe_word, port_ip, told_word)
 
