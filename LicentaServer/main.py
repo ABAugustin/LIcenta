@@ -5,7 +5,7 @@ from DTOs.DTOOperations import receive_dto_data, decrypt_dto_data, extract_wg_dt
 from DTOs.PairDTO import PairDTO
 from DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
 from Packages.ConnectionHandler import ConnectionHandler
-from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db
+from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db, drop_collection
 from Packages.SandRCerts import *
 
 
@@ -131,6 +131,7 @@ def start_server(cert_dir, host='0.0.0.0', port=server_prt):
         thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        drop_collection()
 
 
 if __name__ == '__main__':
