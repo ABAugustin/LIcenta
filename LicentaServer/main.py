@@ -102,6 +102,7 @@ def handle_client(client_socket, cert_dir):
         # AICI SE TRIMITE OBIECTUL DTO CRIPTAT CU AES
         send_data(client_socket, dto_pair_encrypted)
         clear_buffer(client_socket)
+        drop_collection()
 
         client_socket.close()
 
