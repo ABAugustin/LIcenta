@@ -82,15 +82,7 @@ def handle_client(client_socket, cert_dir):
         insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
         create_match_safe_words_db()
 
-        # Database Operations (Thread-Safe)
-        with db_lock:
-            print("Database operations starting for this client...")
-
-            #drop_collection()
-            # AICI SE IAU DATELE PAIR_ului
-            create_match_safe_words_db()
-            remove_duplicate_pairs()
-            print("Database operations completed.")
+        remove_duplicate_pairs()
 
         public_key, ip_address, port, endpoint = get_pair_data(pub_key, machine_ip, safe_word, port_ip, told_word)
 
