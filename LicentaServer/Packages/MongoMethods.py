@@ -167,3 +167,7 @@ def remove_duplicate_pairs():
     client.close()
 
     return removed_count
+
+def drop_collection():
+    collection,client = connect_to_database_clients()
+    collection.drop()
