@@ -47,7 +47,7 @@ def create_match_safe_words_db():
     paired_documents = []
 
     # Ensure there are at least two documents to process
-    while len(documents) < 2:
+    while len(documents) < 2 or len(documents) % 2 == 0:
         documents = list(coll_clients.find())
         time.sleep(1)
 

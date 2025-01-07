@@ -5,7 +5,8 @@ from DTOs.DTOOperations import receive_dto_data, decrypt_dto_data, extract_wg_dt
 from DTOs.PairDTO import PairDTO
 from DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
 from Packages.ConnectionHandler import ConnectionHandler
-from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db, drop_collection
+from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db, drop_collection, \
+    remove_duplicate_pairs
 from Packages.SandRCerts import *
 
 
@@ -91,7 +92,7 @@ def handle_client(client_socket, cert_dir):
     insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
 
     create_match_safe_words_db()
-
+    remove_duplicate_pairs()
 
     # AICI SE IAU DATELE PAIR_ului
     public_key, ip_address, port, endpoint = get_pair_data(pub_key, machine_ip, safe_word, port_ip, told_word)
@@ -124,6 +125,7 @@ def start_server(cert_dir, host='0.0.0.0', port=server_prt):
 
     print(f"Server listening on {host}:{port}")
     while True:
+
         client_socket, client_address = server_socket.accept()
         print(f"Connection from {client_address}")
 
@@ -131,7 +133,6 @@ def start_server(cert_dir, host='0.0.0.0', port=server_prt):
         thread = threading.Thread(target=handle_client, args=(client_socket, cert_dir))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
-        drop_collection()
 
 
 if __name__ == '__main__':
