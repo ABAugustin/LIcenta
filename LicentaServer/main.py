@@ -99,7 +99,9 @@ def handle_client(client_socket, cert_dir):
 
     # AICI SE IAU DATELE PAIR_ului
     public_key, ip_address, port, endpoint = get_pair_data(pub_key, machine_ip, safe_word, port_ip, told_word)
-
+    print("//////////////////////////////////////////")
+    print(public_key, ip_address, port, endpoint)
+    print("//////////////////////////////////////////")
     # AICI SE CREAZA DTO ul de pair
     pair_dto = PairDTO(public_key, ip_address, port, endpoint)
 
