@@ -128,6 +128,12 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
         client.close()
         print("aici")
         print(other_pair)
+
+        print("***********************************************************************")
+        print(document["pair_1"])
+        print(document["pair_2"])
+        print("***********************************************************************")
+
         print(f"PublicKey: {other_pair['publicKey']}")
         print(f"IPAddress: {other_pair['ipAddress']}")
         print(f"Port: {other_pair['port']}")
