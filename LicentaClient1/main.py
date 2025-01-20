@@ -69,9 +69,9 @@ def diffie_hellman_exchange(server_socket,public_key_server):
     print(shared_secret)
     return shared_secret
 
-def set_up_and_send_wg_dto(server_socket,user_id,aes_key,safe_word, told_word):
+def set_up_and_send_wg_dto(server_socket,user_id,aes_key,safe_word, told_word,root_password):
     # set up wg dto
-    safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = set_up_wireguard(user_id, safe_word, told_word)
+    safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word = set_up_wireguard(user_id, safe_word, told_word,root_password)
 
     # Create wg dto object
     wg_dto = WireguardDTO(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word)
@@ -112,20 +112,24 @@ def connect_to_server(server_ip, server_port, cert_dir):
 
         #PRIMESC CERTIFICATE DE GREETING
         public_key_server, user_id = receive_ssl_greeting_certificate_main(server_socket,server_ip,server_port,cert_dir)
-
+        print("a fost primit greeting cert")
         #Diffie hellman exchange
         shared_secret = diffie_hellman_exchange(server_socket, public_key_server)
-
+        print("a fost calculat shared secret")
         # with the obtained public key we can transfer the wg set-up to server
         aes_key = derive_key(shared_secret)
         # set up wg dto + send
         set_up_and_send_wg_dto(server_socket, user_id,aes_key,safe_word, told_word)
-
+        print("a fost setat prima parte de wg")
         #receive pairing dto
+        print("va fi primit pairing data")
         public_key_pair, ip_address_pair, port_pair, endpoint_pair = receive_pairing_dto(server_socket,aes_key)
+        print("a fost primit paring data")
 
         # set up final wg with pair
+        print("incepe a doua parte de wg")
         final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair)
+        print("a fost setat a doua parte de wg")
 
     server_socket.close()
 

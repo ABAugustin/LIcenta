@@ -142,6 +142,13 @@ def get_pair_data(publicKey, ipAddress, securityCodeDest, port, securityCodeExp)
         return (other_pair["publicKey"], other_pair["ipAddress"],other_pair["port"], other_pair["endpoint"])
 
 
+def delete_unchecked_entries():
+    coll_clients, client_cli = connect_to_database_clients()
+    result = coll_clients.delete_many({"checked": {"$ne": 1}})
+    print(f"Deleted {result.deleted_count} unchecked entries.")
+
+
+
 def remove_duplicate_pairs():
     collection, client = connect_to_database_matches()
 

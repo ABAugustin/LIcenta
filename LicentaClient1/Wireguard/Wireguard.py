@@ -5,7 +5,7 @@ def generate_safe_word():
     return random.choice(words)
 
 
-def run_command_with_sudo(command, password="abelbossu"):
+def run_command_with_sudo(command, password):
     process = subprocess.Popen(['sudo', '-S'] + command,
                                stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE,
@@ -15,7 +15,7 @@ def run_command_with_sudo(command, password="abelbossu"):
     return stdout, stderr
 
 
-def set_up_wireguard(user_id,safe_word,told_word):
+def set_up_wireguard(user_id,safe_word,told_word,root_password):
     # get machine ip, public wireguard key, sub-ip with port,
 
     # get machine ip
@@ -38,22 +38,22 @@ def set_up_wireguard(user_id,safe_word,told_word):
     # wireguard setup
 
     command = ["ip", "link", "add", "dev", "wg0", "type", "wireguard"]
-    stdout, stderr = run_command_with_sudo(command)
+    stdout, stderr = run_command_with_sudo(command,root_password)
 
     # sub-ip
     sub_ip = "10.0.0." + str(user_id)
 
     command = ["ip", "addr", "add", sub_ip + "/24", "dev", "wg0",]
-    stdout, stderr = run_command_with_sudo(command)
+    stdout, stderr = run_command_with_sudo(command,root_password)
 
     command = ["wg", "set", "wg0", "private-key", "./private"]
-    stdout, stderr = run_command_with_sudo(command)
+    stdout, stderr = run_command_with_sudo(command,root_password)
 
     command = ["ip", "link", "set", "wg0", "up"]
-    stdout, stderr = run_command_with_sudo(command)
+    stdout, stderr = run_command_with_sudo(command,root_password)
 
     command = ['wg', 'show', 'wg0']
-    stdout, stderr = run_command_with_sudo(command)
+    stdout, stderr = run_command_with_sudo(command,root_password)
 
     port_ip = re.search(r'listening port:\s+(\d+)', stdout).group(1)
 
