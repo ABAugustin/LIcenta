@@ -81,12 +81,12 @@ class PasswordDialog(QDialog):
 
 
 class ConnectionWindow(QMainWindow):
-    def __init__(self, root_password):
+    def __init__(self, root_password1):
         super().__init__()
         self.setWindowTitle("File Transfer Connection")
         self.resize_relative_to_screen(0.5, 0.5)
         self.center_window()
-        self.root_password = root_password
+        self.root_password = root_password1
 
         self.server_socket = None
         self.server_connected = False
