@@ -68,14 +68,14 @@ def set_up_wireguard(user_id,safe_word,told_word,root_password):
 
     return safe_word, machine_ip, pub_key, sub_ip, port_ip, told_word
 
-def final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair):
+def final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair,root_passowrd):
 
     print(public_key_pair)
     print(ip_address_pair)
     print(port_pair)
     print(endpoint_pair)
     command = ["wg", "set", "wg0", "peer", str(public_key_pair),"allowed-ips", str(endpoint_pair) + "/32", "endpoint",str(ip_address_pair)+":"+str(port_pair)]
-    stdout, stderr = run_command_with_sudo(command)
+    stdout, stderr = run_command_with_sudo(command,root_passowrd)
 
 
 
