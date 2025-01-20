@@ -18,6 +18,7 @@ class PasswordDialog(QDialog):
         super().__init__()
         self.setWindowTitle("Root Password")
         self.setFixedSize(400, 200)
+        self.password = None
 
         # Set custom stylesheet for the dialog
         self.setStyleSheet("""
@@ -69,7 +70,7 @@ class PasswordDialog(QDialog):
         layout.addWidget(self.button_box)
 
         self.setLayout(layout)
-        self.password = None
+
 
     def accept_password(self):
         self.password = self.password_input.text()
@@ -184,7 +185,7 @@ class ConnectionWindow(QMainWindow):
             self.told_word = input_code
             set_up_and_send_wg_dto(self.server_socket, self.user_id, self.aes_key, self.safe_word, self.told_word, self.root_password)
             public_key_pair, ip_address_pair, port_pair, endpoint_pair = receive_pairing_dto(self.server_socket, self.aes_key)
-            final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair)
+            final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair,self.root_password)
             self.label.setText("Pairing complete! WireGuard setup finalized.")
             self.label.setStyleSheet("color: #A3BE8C;")
             self.switch_to_transfer_window()
