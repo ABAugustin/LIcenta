@@ -19,12 +19,8 @@ def handle_client(client_socket, cert_dir):
 
     # Generate greeting certificate
     private_key = generate_greeting_certificate(cert_dir, user_ip_no, user_count_no)
-
     # Send greeting certificate
     send_certificate(client_socket, cert_dir, cert_file='/' + str(user_count_no) + "/greeting_certificate.pem")
-
-    print("~~~~~~~~~ A fost trimis certificatul ~~~~~~~~~~~~")
-
     clear_buffer(client_socket)
 
     # Diffie-Hellman key exchange
@@ -32,8 +28,6 @@ def handle_client(client_socket, cert_dir):
     server_public_key_dh = dh_generate_public_key(server_private_key_dh)
 
     encrypted_client_public_key_dh = receive_data(client_socket)
-
-    print("~~~~~~~~~ A fost primita cheia DH client ~~~~~~~~~~~~")
     clear_buffer(client_socket)
 
     client_public_key_dh_bytes = private_key.decrypt(
@@ -44,17 +38,14 @@ def handle_client(client_socket, cert_dir):
             label=None
         )
     )
-
     client_public_key_dh = int.from_bytes(client_public_key_dh_bytes, "big")
-
     server_public_key_dh_bytes = server_public_key_dh.to_bytes((server_public_key_dh.bit_length() + 7) // 8, "big")
-
     send_data(client_socket, server_public_key_dh_bytes)
     clear_buffer(client_socket)
 
-    print("~~~~~~~~~ A fost trimis cheia serverului catre client DH ~~~~~~~~~~~~")
-
     shared_secret = compute_shared_secret(client_public_key_dh, server_private_key_dh)
+
+
 
     wg_dto_encrypted = receive_data(client_socket)
     clear_buffer(client_socket)
@@ -92,7 +83,7 @@ def handle_client(client_socket, cert_dir):
 def cleanup_unchecked_entries():
     while True:
         delete_unchecked_entries()
-        time.sleep(240)  # Wait for 2 minutes
+        time.sleep(300)  # Wait for 5 minutes
 
 def start_server(cert_dir, host='0.0.0.0', port=server_prt):
     if not os.path.exists(cert_dir):
@@ -105,7 +96,6 @@ def start_server(cert_dir, host='0.0.0.0', port=server_prt):
 
     print(f"Server listening on {host}:{port}")
 
-    # Start cleanup thread
     cleanup_thread = threading.Thread(target=cleanup_unchecked_entries, daemon=True)
     cleanup_thread.start()
 

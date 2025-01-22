@@ -87,6 +87,7 @@ def set_up_and_send_wg_dto(server_socket,user_id,aes_key,safe_word, told_word,ro
     # !!!!!!!!!!!!!!!!!!!! ---- end   AES -----------------------
     send_data(server_socket, dto_wg_encrypted)
     clear_buffer(server_socket)
+    return sub_ip,port_ip
 
 def receive_pairing_dto(server_socket,aes_key):
     pair_dto_encrypted = receive_data(server_socket)
