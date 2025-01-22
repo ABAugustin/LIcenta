@@ -212,7 +212,7 @@ class ConnectionWindow(QMainWindow):
 
 
 class FileTransferWindow(QMainWindow):
-    def __init__(self, wireguard_ip, wireguard_port, peer_wireguard_ip, peer_wireguard_port):
+    def __init__(self ,peer_wireguard_ip, peer_wireguard_port, wireguard_ip, wireguard_port):
         self.wireguard_ip = wireguard_ip
         self.wireguard_port = wireguard_port
         self.peer_wireguard_ip = peer_wireguard_ip
@@ -281,8 +281,13 @@ class FileTransferWindow(QMainWindow):
 
     def init_peer_to_peer(self):
         self.peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        self.peer_socket.bind((self.wireguard_ip, int(self.wireguard_port)))  # Leagă socket-ul la adresa WireGuard
+        print("local stuff")
+        print(self.wireguard_ip)
+        print(int(self.wireguard_port))
+        print("peer stuff")
+        print(self.peer_wireguard_ip)
+        print(self.peer_wireguard_port)
+        self.peer_socket.bind((self.peer_wireguard_ip, int(self.wireguard_port)))  # Leagă socket-ul la adresa WireGuard
         self.peer_socket.listen(1)
         threading.Thread(target=self.accept_connections, daemon=True).start()
 
@@ -315,7 +320,7 @@ class FileTransferWindow(QMainWindow):
         if hasattr(self, 'file_path') and self.peer_wireguard_ip and self.peer_wireguard_port:
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
+                print(f"Connecting to {self.wireguard_ip}:{self.peer_wireguard_port}")
                 conn.connect((self.peer_wireguard_ip, int(self.peer_wireguard_port)))  # Conectează-te prin WireGuard
 
                 file_name = os.path.basename(self.file_path)
@@ -355,7 +360,7 @@ def main():
             # Lansează a doua aplicație (FileTransferWindow)
 
             app2 = QApplication(sys.argv)
-            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,connection_window.wireguard_port_local,connection_window.peer_wireguard_ip_remote,connection_window.peer_wireguard_port_remote)
+            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,8080,connection_window.peer_wireguard_ip_remote,8080)
             transfer_window.show()
             sys.exit(app2.exec_())
         else:
