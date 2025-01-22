@@ -93,6 +93,7 @@ class ConnectionWindow(QMainWindow):
         self.user_id = None
         self.safe_word = None
         self.told_word = None
+        self.target_ip = None
         self.initUI()
         threading.Thread(target=self.establish_connection, daemon=True).start()
 
@@ -154,10 +155,6 @@ class ConnectionWindow(QMainWindow):
             print(f"Error establishing connection: {e}")
 
     def on_click_generate_safe_word(self):
-        if not self.server_connected:
-            self.label.setText("Not connected to server")
-            self.label.setStyleSheet("color: #BF616A;")
-            return
         try:
             self.code.setText(generate_safe_word())
             public_key_server, self.user_id = receive_ssl_greeting_certificate_main(self.server_socket, server_ip, server_port, cert_dir)
@@ -184,7 +181,8 @@ class ConnectionWindow(QMainWindow):
             self.told_word = input_code
             set_up_and_send_wg_dto(self.server_socket, self.user_id, self.aes_key, self.safe_word, self.told_word, self.root_password)
             public_key_pair, ip_address_pair, port_pair, endpoint_pair = receive_pairing_dto(self.server_socket, self.aes_key)
-            final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair,self.root_password)
+            final_wireguard_setup(public_key_pair, ip_address_pair, port_pair, endpoint_pair, self.root_password)
+            self.target_ip = endpoint_pair
             self.label.setText("Pairing complete! WireGuard setup finalized.")
             self.label.setStyleSheet("color: #A3BE8C;")
             self.switch_to_transfer_window()
@@ -194,19 +192,17 @@ class ConnectionWindow(QMainWindow):
             print(f"Error during pairing process: {e}")
 
     def switch_to_transfer_window(self):
-        self.transfer_window = TransferWindow(self.root_password)
+        self.transfer_window = TransferWindow(self.root_password, self.target_ip)
         self.transfer_window.show()
         self.close()
-
-
 class TransferWindow(QMainWindow):
-    def __init__(self, root_password):
+    def __init__(self, root_password, target_ip):
         super().__init__()
         self.setWindowTitle("File Transfer Application")
         self.resize_relative_to_screen(0.5, 0.5)
         self.center_window()
         self.root_password = root_password
-
+        self.target_ip = target_ip
         self.files_to_send = []
         self.received_folder_path = "./received_files"
         threading.Thread(target=self.start_server, daemon=True).start()
@@ -228,7 +224,6 @@ class TransferWindow(QMainWindow):
     def initUI(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-
         main_layout = QVBoxLayout()
 
         file_folder_layout = QVBoxLayout()
@@ -292,12 +287,11 @@ class TransferWindow(QMainWindow):
         if not self.files_to_send:
             self.file_label.setText("No files selected for transfer!")
             return
-        target_ip = "10.0.0.2"
         for file_path in self.files_to_send:
             try:
                 file_name = os.path.basename(file_path)
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                client_socket.connect((target_ip, 12345))
+                client_socket.connect((self.target_ip, 12345))
 
                 client_socket.send(file_name.encode())
                 with open(file_path, "rb") as file:
