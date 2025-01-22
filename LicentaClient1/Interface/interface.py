@@ -282,8 +282,11 @@ class FileTransferWindow(QMainWindow):
     def init_peer_to_peer(self):
         # Set up server to listen for incoming connections
         self.peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.peer_socket.bind((self.wireguard_ip, self.wireguard_port))
+        self.peer_socket.bind((self.peer_wireguard_ip, self.peer_wireguard_port))
         self.peer_socket.listen(1)
+        print("serverul asculta pe")
+        print(self.peer_wireguard_ip)
+        print(self.peer_wireguard_port)
         threading.Thread(target=self.accept_connections, daemon=True).start()
 
     def accept_connections(self):
@@ -294,10 +297,22 @@ class FileTransferWindow(QMainWindow):
     def handle_peer(self, conn):
         try:
             with conn:
-                file_name = conn.recv(1024).decode()
-                file_size = int(conn.recv(1024).decode())
+                # Citește numele fișierului
+                file_name = conn.recv(1024).decode().strip()
+                if not file_name:
+                    print("No file name received.")
+                    return
+
+                # Citește dimensiunea fișierului
+                file_size_data = conn.recv(1024).decode().strip()
+                if not file_size_data.isdigit():
+                    print(f"Invalid file size: {file_size_data}")
+                    return
+
+                file_size = int(file_size_data)
                 file_path = os.path.join(self.receive_folder, file_name)
 
+                # Primesc datele fișierului
                 with open(file_path, "wb") as f:
                     received = 0
                     while received < file_size:
@@ -315,14 +330,18 @@ class FileTransferWindow(QMainWindow):
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
-                conn.connect((self.peer_wireguard_ip, self.peer_wireguard_port))
+                conn.connect((self.wireguard_ip, int(self.peer_wireguard_port)))
 
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
 
-                conn.sendall(file_name.encode())
-                conn.sendall(str(file_size).encode())
+                # Trimit numele fișierului
+                conn.sendall(file_name.encode() + b'\n')
 
+                # Trimit dimensiunea fișierului
+                conn.sendall(str(file_size).encode() + b'\n')
+
+                # Trimit conținutul fișierului
                 with open(self.file_path, "rb") as f:
                     while chunk := f.read(4096):
                         conn.sendall(chunk)
