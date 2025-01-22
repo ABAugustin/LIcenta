@@ -351,7 +351,7 @@ def main():
             # Lansează a doua aplicație (FileTransferWindow)
 
             app2 = QApplication(sys.argv)
-            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,connection_window.wireguard_port_localt,connection_window.peer_wireguard_ip_remotep,connection_window.peer_wireguard_port_remote)
+            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,connection_window.wireguard_port_local,connection_window.peer_wireguard_ip_remotep,connection_window.peer_wireguard_port_remote)
             transfer_window.show()
             sys.exit(app2.exec_())
         else:
