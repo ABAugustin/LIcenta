@@ -1,5 +1,7 @@
 import socket
 import threading
+from tkinter.tix import INTEGER
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QWidget, QDialog, QDialogButtonBox, QFileDialog
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -279,8 +281,8 @@ class FileTransferWindow(QMainWindow):
 
     def init_peer_to_peer(self):
         self.peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.peer_socket.bind((self.wireguard_ip, self.wireguard_port))  # Leagă socket-ul la adresa WireGuard
-        self.peer_socket.bind(("0.0.0.0", 0))
+
+        self.peer_socket.bind((self.wireguard_ip, int(self.wireguard_port)))  # Leagă socket-ul la adresa WireGuard
         self.peer_socket.listen(1)
         threading.Thread(target=self.accept_connections, daemon=True).start()
 
@@ -309,10 +311,12 @@ class FileTransferWindow(QMainWindow):
             print(f"Error receiving file: {e}")
 
     def send_file(self):
-        if hasattr(self, 'file_path') and hasattr(self, 'peer_address'):
+        # Verifică dacă fișierul și endpoint-urile WireGuard sunt setate
+        if hasattr(self, 'file_path') and self.peer_wireguard_ip and self.peer_wireguard_port:
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                conn.connect((self.peer_wireguard_ip, self.peer_wireguard_port))  # Conectează-te la destinatar prin WireGuard
+                print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
+                conn.connect((self.peer_wireguard_ip, int(self.peer_wireguard_port)))  # Conectează-te prin WireGuard
 
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
@@ -328,7 +332,7 @@ class FileTransferWindow(QMainWindow):
             except Exception as e:
                 print(f"Error sending file: {e}")
         else:
-            print("File path or peer address not set")
+            print("File path or WireGuard peer address not set")
 
 
 def main():
@@ -351,7 +355,7 @@ def main():
             # Lansează a doua aplicație (FileTransferWindow)
 
             app2 = QApplication(sys.argv)
-            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,connection_window.wireguard_port_local,connection_window.peer_wireguard_ip_remotep,connection_window.peer_wireguard_port_remote)
+            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,connection_window.wireguard_port_local,connection_window.peer_wireguard_ip_remote,connection_window.peer_wireguard_port_remote)
             transfer_window.show()
             sys.exit(app2.exec_())
         else:
