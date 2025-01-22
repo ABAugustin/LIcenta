@@ -211,7 +211,7 @@ class ConnectionWindow(QMainWindow):
 
 
 class FileTransferWindow(QMainWindow):
-    def __init__(self, wireguard_ip, wireguard_port, peer_wireguard_ip, peer_wireguard_port):
+    def __init__(self, peer_wireguard_ip, peer_wireguard_port, wireguard_ip, wireguard_port):
         self.wireguard_ip = wireguard_ip
         self.wireguard_port = wireguard_port
         self.peer_wireguard_ip = peer_wireguard_ip
@@ -336,7 +336,7 @@ class FileTransferWindow(QMainWindow):
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
-                conn.connect((self.peer_wireguard_ip, int(self.peer_wireguard_port)))
+                conn.connect((self.wireguard_ip, int(self.wireguard_port)))
 
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
