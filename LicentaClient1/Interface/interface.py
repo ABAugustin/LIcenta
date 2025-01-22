@@ -13,7 +13,6 @@ from Wireguard.Wireguard import generate_safe_word, final_wireguard_setup
 from Headers.headers import *
 from main import receive_ssl_greeting_certificate_main, diffie_hellman_exchange, set_up_and_send_wg_dto, receive_pairing_dto
 
-
 class PasswordDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -80,7 +79,6 @@ class PasswordDialog(QDialog):
             self.label.setText("Password cannot be empty!")
             self.label.setStyleSheet("color: #BF616A;")
 
-
 class ConnectionWindow(QMainWindow):
     def __init__(self, root_password):
         super().__init__()
@@ -88,6 +86,39 @@ class ConnectionWindow(QMainWindow):
         self.resize_relative_to_screen(0.5, 0.5)
         self.center_window()
         self.root_password = root_password
+
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #2E3440;
+                color: white;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            QLabel {
+                font-size: 16px;
+                color: white;
+            }
+            QPushButton {
+                background-color: #88C0D0;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 5px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #2E3440;
+            }
+            QPushButton:hover {
+                background-color: #81A1C1;
+            }
+            QLineEdit {
+                padding: 5px;
+                font-size: 14px;
+                border: 1px solid #88C0D0;
+                border-radius: 5px;
+                background-color: #3B4252;
+                color: white;
+            }
+        """)
 
         self.wireguard_ip_local = None
         self.wireguard_port_local = None
@@ -188,9 +219,9 @@ class ConnectionWindow(QMainWindow):
     def handle_submit_code(self, input_code):
         try:
             self.told_word = input_code
-            self.wireguard_ip_local, self.wireguard_port_local =set_up_and_send_wg_dto(self.server_socket, self.user_id, self.aes_key, self.safe_word, self.told_word,
-                                   self.root_password)
-            public_key_pair, ip_address_pair, port_pair, endpoint_pair = receive_pairing_dto(self.server_socket,self.aes_key)
+            self.wireguard_ip_local, self.wireguard_port_local = set_up_and_send_wg_dto(self.server_socket, self.user_id, self.aes_key, self.safe_word, self.told_word,
+                                                                                       self.root_password)
+            public_key_pair, ip_address_pair, port_pair, endpoint_pair = receive_pairing_dto(self.server_socket, self.aes_key)
             self.peer_wireguard_ip_remote = endpoint_pair
             self.peer_wireguard_port_remote = port_pair
 
@@ -198,7 +229,7 @@ class ConnectionWindow(QMainWindow):
 
             self.label.setText("Pairing complete! WireGuard setup finalized.")
             self.label.setStyleSheet("color: #A3BE8C;")
-            QApplication.quit()  # Închide aplicația curentă
+            QApplication.quit()  # Close the current application
         except Exception as e:
             self.label.setText("Failed to complete pairing")
             self.label.setStyleSheet("color: #BF616A;")
@@ -208,7 +239,6 @@ class ConnectionWindow(QMainWindow):
         self.close()
         self.transfer_window = FileTransferWindow()
         self.transfer_window.show()
-
 
 class FileTransferWindow(QMainWindow):
     def __init__(self, wireguard_ip, wireguard_port, peer_wireguard_ip, peer_wireguard_port):
@@ -220,6 +250,39 @@ class FileTransferWindow(QMainWindow):
         self.setWindowTitle("File Transfer Application")
         self.resize_relative_to_screen(0.5, 0.5)
         self.center_window()
+
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #2E3440;
+                color: white;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            QLabel {
+                font-size: 16px;
+                color: white;
+            }
+            QPushButton {
+                background-color: #88C0D0;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 5px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #2E3440;
+            }
+            QPushButton:hover {
+                background-color: #81A1C1;
+            }
+            QLineEdit {
+                padding: 5px;
+                font-size: 14px;
+                border: 1px solid #88C0D0;
+                border-radius: 5px;
+                background-color: #3B4252;
+                color: white;
+            }
+        """)
 
         self.initUI()
         self.peer_socket = None
@@ -264,6 +327,12 @@ class FileTransferWindow(QMainWindow):
         self.send_button.clicked.connect(self.send_file)
         layout.addWidget(self.send_button)
 
+        # Add success message label
+        self.success_label = QLabel("")
+        self.success_label.setAlignment(Qt.AlignCenter)
+        self.success_label.setStyleSheet("color: #A3BE8C; font-weight: bold;")
+        layout.addWidget(self.success_label)
+
         central_widget.setLayout(layout)
 
     def select_file(self):
@@ -283,9 +352,6 @@ class FileTransferWindow(QMainWindow):
         self.peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.peer_socket.bind((self.wireguard_ip, self.wireguard_port))
         self.peer_socket.listen(1)
-        print("serverul asculta pe")
-        print(self.peer_wireguard_ip)
-        print(self.peer_wireguard_port)
         threading.Thread(target=self.accept_connections, daemon=True).start()
 
     def accept_connections(self):
@@ -296,13 +362,11 @@ class FileTransferWindow(QMainWindow):
     def handle_peer(self, conn):
         try:
             with conn:
-                # Citește și decodifică mesajul inițial (nume + dimensiune fișier)
                 header = conn.recv(1024).decode()
                 if not header:
                     print("No header received.")
                     return
 
-                # Split mesajul în nume și dimensiune, folosind delimitatorul '\n'
                 parts = header.split('\n')
                 if len(parts) < 2:
                     print(f"Invalid header format: {header}")
@@ -318,7 +382,6 @@ class FileTransferWindow(QMainWindow):
                 file_size = int(file_size_data)
                 file_path = os.path.join(self.receive_folder, file_name)
 
-                # Primesc datele fișierului
                 with open(file_path, "wb") as f:
                     received = 0
                     while received < file_size:
@@ -328,6 +391,7 @@ class FileTransferWindow(QMainWindow):
                         f.write(data)
                         received += len(data)
                 print(f"Received file: {file_path}")
+                self.success_label.setText(f"File '{file_name}' received successfully!")
         except Exception as e:
             print(f"Error receiving file: {e}")
 
@@ -341,20 +405,18 @@ class FileTransferWindow(QMainWindow):
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
 
-                # Trimit numele fișierului și dimensiunea acestuia, delimitate prin '\n'
                 conn.sendall(f"{file_name}\n{file_size}\n".encode())
 
-                # Trimit conținutul fișierului
                 with open(self.file_path, "rb") as f:
                     while chunk := f.read(4096):
                         conn.sendall(chunk)
                 conn.close()
                 print("File sent successfully")
+                self.success_label.setText(f"File '{file_name}' sent successfully!")
             except Exception as e:
                 print(f"Error sending file: {e}")
         else:
             print("File path or WireGuard peer address not set")
-
 
 def main():
     # Prima aplicație
@@ -367,7 +429,6 @@ def main():
         connection_window = ConnectionWindow(password_dialog.password)
         connection_window.show()
 
-
         # Run the first application
         exit_code = app.exec_()
 
@@ -376,7 +437,7 @@ def main():
             # Lansează a doua aplicație (FileTransferWindow)
 
             app2 = QApplication(sys.argv)
-            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local,8080,connection_window.peer_wireguard_ip_remote,8080)
+            transfer_window = FileTransferWindow(connection_window.wireguard_ip_local, 8080, connection_window.peer_wireguard_ip_remote, 8080)
             transfer_window.show()
             sys.exit(app2.exec_())
         else:
