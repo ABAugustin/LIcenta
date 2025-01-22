@@ -297,14 +297,21 @@ class FileTransferWindow(QMainWindow):
     def handle_peer(self, conn):
         try:
             with conn:
-                # Citește numele fișierului
-                file_name = conn.recv(1024).decode().strip()
-                if not file_name:
-                    print("No file name received.")
+                # Citește și decodifică mesajul inițial (nume + dimensiune fișier)
+                header = conn.recv(1024).decode()
+                if not header:
+                    print("No header received.")
                     return
 
-                # Citește dimensiunea fișierului
-                file_size_data = conn.recv(1024).decode().strip()
+                # Split mesajul în nume și dimensiune, folosind delimitatorul '\n'
+                parts = header.split('\n')
+                if len(parts) < 2:
+                    print(f"Invalid header format: {header}")
+                    return
+
+                file_name = parts[0].strip()
+                file_size_data = parts[1].strip()
+
                 if not file_size_data.isdigit():
                     print(f"Invalid file size: {file_size_data}")
                     return
@@ -330,16 +337,13 @@ class FileTransferWindow(QMainWindow):
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
-                conn.connect((self.wireguard_ip, int(self.peer_wireguard_port)))
+                conn.connect((self.peer_wireguard_ip, int(self.peer_wireguard_port)))
 
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
 
-                # Trimit numele fișierului
-                conn.sendall(file_name.encode() + b'\n')
-
-                # Trimit dimensiunea fișierului
-                conn.sendall(str(file_size).encode() + b'\n')
+                # Trimit numele fișierului și dimensiunea acestuia, delimitate prin '\n'
+                conn.sendall(f"{file_name}\n{file_size}\n".encode())
 
                 # Trimit conținutul fișierului
                 with open(self.file_path, "rb") as f:
@@ -351,6 +355,7 @@ class FileTransferWindow(QMainWindow):
                 print(f"Error sending file: {e}")
         else:
             print("File path or WireGuard peer address not set")
+
 
 def main():
     # Prima aplicație
