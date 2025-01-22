@@ -208,7 +208,8 @@ class TransferWindow(QMainWindow):
         self.root_password = root_password
 
         self.files_to_send = []
-        self.received_folder_path = ""
+        self.received_folder_path = "./received_files"
+        threading.Thread(target=self.start_server, daemon=True).start()
         self.initUI()
 
     def resize_relative_to_screen(self, width_ratio: float, height_ratio: float):
@@ -265,43 +266,60 @@ class TransferWindow(QMainWindow):
             self.received_folder_path = folder
             self.folder_label.setText(f"Selected Folder: {folder}")
 
+    def start_server(self):
+        try:
+            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server_socket.bind(("0.0.0.0", 12345))
+            server_socket.listen(5)
+            print("[SERVER] Listening on port 12345")
+
+            while True:
+                client_socket, client_address = server_socket.accept()
+                print(f"[SERVER] Connection from {client_address}")
+
+                file_name = client_socket.recv(1024).decode()
+                file_path = f"{self.received_folder_path}/{file_name}"
+                with open(file_path, "wb") as file:
+                    while chunk := client_socket.recv(1024):
+                        file.write(chunk)
+
+                print(f"[SERVER] File saved: {file_path}")
+                client_socket.close()
+        except Exception as e:
+            print(f"[SERVER] Error: {e}")
+
     def send_data(self):
         if not self.files_to_send:
             self.file_label.setText("No files selected for transfer!")
-            self.file_label.setStyleSheet("color: #BF616A;")
             return
-        if not self.received_folder_path:
-            self.folder_label.setText("No folder selected for received data!")
-            self.folder_label.setStyleSheet("color: #BF616A;")
-            return
+        target_ip = "10.0.0.2"
+        for file_path in self.files_to_send:
+            try:
+                file_name = os.path.basename(file_path)
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.connect((target_ip, 12345))
 
-        try:
-            # Implement your data transfer logic here
-            self.file_label.setText("Data transfer started...")
-            self.file_label.setStyleSheet("color: #88C0D0;")
-            # Your file transfer logic goes here
-            self.file_label.setText("Data transfer complete!")
-            self.file_label.setStyleSheet("color: #A3BE8C;")
-        except Exception as e:
-            self.file_label.setText("Failed to send data")
-            self.file_label.setStyleSheet("color: #BF616A;")
-            print(f"Error during data transfer: {e}")
+                client_socket.send(file_name.encode())
+                with open(file_path, "rb") as file:
+                    while chunk := file.read(1024):
+                        client_socket.send(chunk)
+
+                print(f"[CLIENT] File sent: {file_name}")
+                client_socket.close()
+            except Exception as e:
+                print(f"[CLIENT] Error sending file {file_path}: {e}")
 
 
-def main():
+if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Show password dialog first
+    # Afișează dialogul pentru introducerea parolei root
     password_dialog = PasswordDialog()
     if password_dialog.exec_() == QDialog.Accepted:
-        # If password is accepted, open the connection window
+        # Dacă parola este acceptată, deschide fereastra ConnectionWindow
         connection_window = ConnectionWindow(password_dialog.password)
         connection_window.show()
         sys.exit(app.exec_())
     else:
         print("Password prompt canceled.")
         sys.exit(0)
-
-
-if __name__ == "__main__":
-    main()

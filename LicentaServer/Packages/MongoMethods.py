@@ -41,12 +41,9 @@ def insert_data_into_db(safe_word, machine_ip, pub_key, sub_ip, port_ip, told_wo
 def create_match_safe_words_db():
     coll_clients, client_cli = connect_to_database_clients()
     coll_matches, client_matches = connect_to_database_matches()
-
     documents = list(coll_clients.find())
-
     paired_documents = []
 
-    # Ensure there are at least two documents to process
     while len(documents) < 2 or len(documents) % 2 != 0:
         documents = list(coll_clients.find())
         time.sleep(1)
@@ -61,12 +58,9 @@ def create_match_safe_words_db():
                 doc1["securityCodeDest"] == doc2["securityCodeExp"] and
                 doc2["securityCodeDest"] == doc1["securityCodeExp"]
             ):
-                # Adjust endpoints if they match
                 if doc1["endpoint"] == doc2["endpoint"]:
                     doc1["endpoint"] = "10.0.0.1"
                     doc2["endpoint"] = "10.0.0.2"
-
-                # Update the `checked` field in the database
                 coll_clients.update_one(
                     {"_id": doc1["_id"]},
                     {"$set": {"checked": "1"}}
@@ -75,17 +69,12 @@ def create_match_safe_words_db():
                     {"_id": doc2["_id"]},
                     {"$set": {"checked": "1"}}
                 )
-
-
                 # Add the pair to the results
                 paired_documents.append({"pair_1": doc1, "pair_2": doc2})
                 break
 
-    # Insert paired documents into the matches collection
     if paired_documents:
         coll_matches.insert_many(paired_documents)
-
-    # Close the database connections
     client_cli.close()
     client_matches.close()
 

@@ -18,6 +18,8 @@ class WireguardDTO:
         print(f"Port IP: {self.port_ip}")
         print(f"Told Word: {self.told_word}")
 
+    def get_endpoint(self):
+        return self.sub_ip
 
     def to_dict(self):
         return {
