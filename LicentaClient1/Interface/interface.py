@@ -1,6 +1,5 @@
 import socket
 import threading
-from tkinter.tix import INTEGER
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QWidget, QDialog, QDialogButtonBox, QFileDialog
 from PyQt5.QtGui import QFont
@@ -336,8 +335,8 @@ class FileTransferWindow(QMainWindow):
         if hasattr(self, 'file_path') and self.peer_wireguard_ip and self.peer_wireguard_port:
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
-                conn.connect((self.peer_wireguard_ip, int(self.peer_wireguard_port)))
+                print(f"Connecting to {self.wireguard_ip}:{self.wireguard_port}")
+                conn.connect((self.wireguard_ip, int(self.wireguard_port)))
 
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
