@@ -212,7 +212,7 @@ class ConnectionWindow(QMainWindow):
 
 
 class FileTransferWindow(QMainWindow):
-    def __init__(self ,peer_wireguard_ip, peer_wireguard_port, wireguard_ip, wireguard_port):
+    def __init__(self, peer_wireguard_ip, peer_wireguard_port, wireguard_ip, wireguard_port):
         self.wireguard_ip = wireguard_ip
         self.wireguard_port = wireguard_port
         self.peer_wireguard_ip = peer_wireguard_ip
@@ -280,14 +280,9 @@ class FileTransferWindow(QMainWindow):
             self.folder_label.setText(f"Selected Folder: {folder_path}")
 
     def init_peer_to_peer(self):
+        # Set up server to listen for incoming connections
         self.peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("local stuff")
-        print(self.wireguard_ip)
-        print(int(self.wireguard_port))
-        print("peer stuff")
-        print(self.peer_wireguard_ip)
-        print(self.peer_wireguard_port)
-        self.peer_socket.bind((self.peer_wireguard_ip, int(self.wireguard_port)))  # Leagă socket-ul la adresa WireGuard
+        self.peer_socket.bind((self.wireguard_ip, self.wireguard_port))
         self.peer_socket.listen(1)
         threading.Thread(target=self.accept_connections, daemon=True).start()
 
@@ -316,12 +311,11 @@ class FileTransferWindow(QMainWindow):
             print(f"Error receiving file: {e}")
 
     def send_file(self):
-        # Verifică dacă fișierul și endpoint-urile WireGuard sunt setate
         if hasattr(self, 'file_path') and self.peer_wireguard_ip and self.peer_wireguard_port:
             try:
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print(f"Connecting to {self.wireguard_ip}:{self.peer_wireguard_port}")
-                conn.connect((self.peer_wireguard_ip, int(self.peer_wireguard_port)))  # Conectează-te prin WireGuard
+                print(f"Connecting to {self.peer_wireguard_ip}:{self.peer_wireguard_port}")
+                conn.connect((self.peer_wireguard_ip, self.peer_wireguard_port))
 
                 file_name = os.path.basename(self.file_path)
                 file_size = os.path.getsize(self.file_path)
@@ -332,13 +326,12 @@ class FileTransferWindow(QMainWindow):
                 with open(self.file_path, "rb") as f:
                     while chunk := f.read(4096):
                         conn.sendall(chunk)
-                print("File sent successfully")
                 conn.close()
+                print("File sent successfully")
             except Exception as e:
                 print(f"Error sending file: {e}")
         else:
             print("File path or WireGuard peer address not set")
-
 
 def main():
     # Prima aplicație
