@@ -1,16 +1,12 @@
-import socket
-import threading
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QWidget, QDialog, QDialogButtonBox, QFileDialog
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 import sys
 from PyQt5.QtGui import QGuiApplication
-
+from Packages.Wireguard.Wireguard import remove_wireguard_interface
 # Import your other modules here
-from AES.AESOperations import derive_key
-from Wireguard.Wireguard import generate_safe_word, final_wireguard_setup
-from Headers.headers import *
+from Packages.AES.AESOperations import derive_key
+from Packages.Wireguard.Wireguard import generate_safe_word, final_wireguard_setup
+from Packages.Headers.headers import *
 from main import receive_ssl_greeting_certificate_main, diffie_hellman_exchange, set_up_and_send_wg_dto, receive_pairing_dto
 
 class PasswordDialog(QDialog):
@@ -440,6 +436,7 @@ def main():
             transfer_window = FileTransferWindow(connection_window.wireguard_ip_local, 8080, connection_window.peer_wireguard_ip_remote, 8080)
             transfer_window.show()
             sys.exit(app2.exec_())
+            remove_wireguard_interface(self.root_password)
         else:
             sys.exit(exit_code)  # Asigurăm închiderea completă dacă apare o eroare
     else:

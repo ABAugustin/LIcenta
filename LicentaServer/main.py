@@ -1,16 +1,13 @@
-import os
-import socket
-import threading
 import time
 import json
 from cryptography.hazmat.primitives.asymmetric import padding
-from AES.AESOperations import derive_key, encrypt_message, decrypt_message
-from DTOs.DTOOperations import receive_dto_data, decrypt_dto_data, extract_wg_dto_data, send_dto
-from DTOs.PairDTO import PairDTO
-from DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
+from Packages.AES.AESOperations import derive_key, encrypt_message, decrypt_message
+from Packages.DTOs.DTOOperations import extract_wg_dto_data
+from Packages.DTOs.PairDTO import PairDTO
+from Packages.DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
 from Packages.ConnectionHandler import ConnectionHandler
-from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db, drop_collection, \
-    remove_duplicate_pairs, delete_unchecked_entries
+from Packages.MongoMethods import insert_data_into_db, create_match_safe_words_db, remove_duplicate_pairs, \
+    delete_unchecked_entries, get_pair_data
 from Packages.SandRCerts import *
 
 def handle_client(client_socket, cert_dir):

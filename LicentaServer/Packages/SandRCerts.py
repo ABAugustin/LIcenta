@@ -1,4 +1,3 @@
-from Headers.headers import *
 from Packages.GenerateCerts import *
 
 

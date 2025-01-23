@@ -1,6 +1,4 @@
-from warnings import catch_warnings
-
-from Headers.headers import *
+from Packages.Headers.headers import *
 
 
 def load_certificate(cert_path):

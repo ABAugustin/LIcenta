@@ -1,6 +1,6 @@
 import x509
 
-from Headers.headers import *
+from Packages.Headers.headers import *
 
 
 def load_certificate(cert_path):

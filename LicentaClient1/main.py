@@ -1,12 +1,13 @@
 import json
 
 
-from AES.AESOperations import derive_key, encrypt_message, decrypt_message
-from DTOs.DTOOperations import receive_dto_data, decrypt_dto_data, extract_pair_dto_data, clear_buffer
-from DTOs.WG_DTO import WireguardDTO
-from DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
+from Packages.AES.AESOperations import derive_key, encrypt_message, decrypt_message
+from Packages.DTOs.DTOOperations import extract_pair_dto_data, clear_buffer
+from Packages.DTOs.WG_DTO import WireguardDTO
+from Packages.DiffieHellman.DH import dh_generate_private_key, dh_generate_public_key, compute_shared_secret
+from Packages.GreetingCertificateOperations import load_certificate, get_grt_cert_pkey_and_id
 from Packages.SndRCert import *
-from Wireguard.Wireguard import *
+from Packages.Wireguard.Wireguard import *
 
 
 def receive_ssl_greeting_certificate_main(server_socket,server_ip,server_port,cert_dir):
@@ -68,6 +69,7 @@ def diffie_hellman_exchange(server_socket,public_key_server):
     print("Shared key e")
     print(shared_secret)
     return shared_secret
+
 
 def set_up_and_send_wg_dto(server_socket,user_id,aes_key,safe_word, told_word,root_password):
     # set up wg dto

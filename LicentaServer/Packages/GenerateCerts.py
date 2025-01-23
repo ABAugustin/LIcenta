@@ -1,5 +1,4 @@
-from Headers.headers import *
-from Packages.MongoMethods import get_pair_data
+from Packages.Headers.headers import *
 
 
 def generate_greeting_certificate(cert_dir, user_ip_no, user_count_no):
